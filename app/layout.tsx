@@ -4,6 +4,8 @@ import "./globals.css";
 import { auth } from "@/auth";
 import { SessionProvider } from "next-auth/react";
 import { Toaster } from "@/components/ui/toaster";
+import ReactQueryProvider from "@/components/provider/react-query-provider";
+import Modals from "@/components/modals/Modals";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -28,8 +30,11 @@ const RootLayout = async ({ children }: { children: React.ReactNode }) => {
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
-          {children}
-          <Toaster />
+          <ReactQueryProvider>
+            <Modals />
+            <Toaster />
+            {children}
+          </ReactQueryProvider>
         </body>
       </SessionProvider>
     </html>

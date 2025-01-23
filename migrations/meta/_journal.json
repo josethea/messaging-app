@@ -8,6 +8,13 @@
       "when": 1737581869689,
       "tag": "0000_marvelous_genesis",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1737629679048,
+      "tag": "0001_worthless_namorita",
+      "breakpoints": true
     }
   ]
 }

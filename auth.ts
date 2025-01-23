@@ -19,7 +19,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     CredentialsProvider({
       async authorize(credentials) {
-        // console.log("on authorize callback");
         if (!credentials?.email || !credentials?.password) {
           return null;
         }
@@ -66,8 +65,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   },
   callbacks: {
     async signIn({ user, account }) {
-      // console.log({ account });
-      // console.log({ user });
       return true;
     },
     async jwt({ token }) {
