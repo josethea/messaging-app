@@ -3,7 +3,7 @@
 import { auth } from "@/auth";
 import { db } from "@/database/drizzle";
 import { channels, members, workspaces } from "@/database/schema";
-import { eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 
 const generateCode = () => {
   const code = Array.from(
@@ -25,7 +25,8 @@ export const getWorkspaces = async (): Promise<Workspace[]> => {
   const data = await db
     .select()
     .from(workspaces)
-    .where(eq(workspaces.userId, session.user.id!));
+    .where(eq(workspaces.userId, session.user.id!))
+    .orderBy(desc(workspaces.createdAt));
 
   return data as Workspace[];
 };

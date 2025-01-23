@@ -30,7 +30,7 @@ import { useSkipUseEffect } from "@/lib/store/useSkipUseEffect";
 const CreateWorkspaceModal = () => {
   const router = useRouter();
   const { open, setOpen } = useCreateWorkspaceModal();
-  const { setSkip } = useSkipUseEffect();
+  const { skip, setSkip } = useSkipUseEffect();
 
   const form = useForm({
     resolver: zodResolver(createWorkspaceSchema),
@@ -52,7 +52,9 @@ const CreateWorkspaceModal = () => {
         description: "Workspace created successfully",
       });
       router.replace(`/workspace/${workspaceId}`);
-      setSkip(true);
+      if (!skip) {
+        setSkip(true);
+      }
       handleClose();
     } else {
       toast({
@@ -101,7 +103,7 @@ const CreateWorkspaceModal = () => {
             />
             <DialogFooter>
               <Button disabled={isPending} type="submit">
-                {isPending ? "Creating..." : "Create"}
+                Create
               </Button>
             </DialogFooter>
           </form>
