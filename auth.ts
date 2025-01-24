@@ -1,6 +1,7 @@
 import NextAuth, { User } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GithubProvider from "next-auth/providers/github";
+import GoogleProvider from "next-auth/providers/google";
 import { db } from "./database/drizzle";
 import { accounts, users } from "./database/schema";
 import { eq } from "drizzle-orm";
@@ -58,6 +59,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     GithubProvider({
       clientId: config.env.authGithubId,
       clientSecret: config.env.authGithubSecret,
+    }),
+    GoogleProvider({
+      clientId: config.env.authGoogleId,
+      clientSecret: config.env.authGoogleSecret,
     }),
   ],
   pages: {

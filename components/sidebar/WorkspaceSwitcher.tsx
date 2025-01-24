@@ -85,17 +85,15 @@ const WorkspaceSwitcher = () => {
                 Workspaces
               </DropdownMenuLabel>
               {filteredWorkspaces?.map((workspace, index) => (
-                <DropdownMenuItem
-                  key={workspace.id}
-                  onClick={() => goToWorkspace(workspace.id)}
-                  className="gap-2 p-2 cursor-pointer"
-                >
-                  <div className="flex size-6 items-center justify-center rounded-sm border">
-                    <Rocket className="size-4 shrink-0" />
-                  </div>
-                  {workspace.name}
-                  <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
-                </DropdownMenuItem>
+                <a href={`/workspace/${workspace.id}`} key={workspace.id}>
+                  <DropdownMenuItem className="gap-2 p-2 cursor-pointer">
+                    <div className="flex size-6 items-center justify-center rounded-sm border">
+                      <Rocket className="size-4 shrink-0" />
+                    </div>
+                    {workspace.name}
+                    <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
+                  </DropdownMenuItem>
+                </a>
               ))}
               <DropdownMenuSeparator />
               <DropdownMenuItem
@@ -105,9 +103,7 @@ const WorkspaceSwitcher = () => {
                 <div className="flex size-6 items-center justify-center rounded-md border bg-background">
                   <Plus className="size-4" />
                 </div>
-                <div className="font-medium text-muted-foreground">
-                  Create new workspace
-                </div>
+                <div className="font-medium">Create new workspace</div>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

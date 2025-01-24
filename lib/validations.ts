@@ -14,3 +14,8 @@ export const signInSchema = z.object({
 export const createWorkspaceSchema = z.object({
   name: z.string().min(3),
 });
+
+export const createChannelSchema = z.object({
+  name: z.string().min(3),
+  description: z.string().default(""),
+});

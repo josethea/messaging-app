@@ -27,3 +27,31 @@ export const getChannels = async (
 
   return data as Channel[];
 };
+
+export const createChannel = async ({
+  name,
+  description,
+  workspaceId,
+}: {
+  name: string;
+  description: string;
+  workspaceId: string;
+}): Promise<string | null> => {
+  const session = await auth();
+
+  if (!session) {
+    console.log("Unauthorized");
+    return null;
+  }
+
+  const channel = await db
+    .insert(channels)
+    .values({
+      name,
+      description,
+      workspaceId,
+    })
+    .returning();
+
+  return channel[0].id;
+};

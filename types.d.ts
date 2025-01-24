@@ -24,3 +24,16 @@ interface Member {
   workspaceId: string;
   role: string;
 }
+
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  image: string | null;
+}
+
+type MemberPopulate = Member & {
+  name: string;
+  email: string;
+  image: string | null;
+};
