@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import {
   SidebarMenu,
   SidebarMenuItem,
@@ -16,19 +16,32 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Plus, ChevronsUpDown, Loader2, Rocket } from "lucide-react";
+import {
+  Plus,
+  ChevronsUpDown,
+  Loader2,
+  Rocket,
+  Share,
+  Settings,
+} from "lucide-react";
 import { useCreateWorkspaceModal } from "@/lib/store/useCreateWorkspaceModal";
-import { useWorkspaceId } from "@/hooks/use-workspace-id";
 import { useQuery } from "@tanstack/react-query";
 import { getWorkspaces } from "@/lib/actions/workspace";
-import { useRouter } from "next/navigation";
+import InviteModal from "../modals/InviteModal";
 
-const WorkspaceSwitcher = () => {
+const WorkspaceSwitcher = ({
+  workspaceId,
+  isPendingCurrentMember,
+  currentMember,
+}: {
+  workspaceId: string | null;
+  isPendingCurrentMember: boolean;
+  currentMember: Member | null | undefined;
+}) => {
   const { isMobile } = useSidebar();
   const { setOpen } = useCreateWorkspaceModal();
-  const router = useRouter();
 
-  const workspaceId = useWorkspaceId();
+  const [inviteOpen, setInviteOpen] = useState(false);
 
   const { isPending, data: workspaces } = useQuery({
     queryKey: ["workspaces"],
@@ -43,73 +56,104 @@ const WorkspaceSwitcher = () => {
     (workspace) => workspace.id !== workspaceId,
   );
 
-  const goToWorkspace = (workspaceId: string) => {
-    router.push(`/workspace/${workspaceId}`);
-  };
-
   return (
-    <SidebarMenu>
-      <SidebarMenuItem>
-        {isPending ? (
-          <div className="flex h-full w-full items-center justify-center">
-            <Loader2 className="h-5 w-5 animate-spin" />
-          </div>
-        ) : (
-          <DropdownMenu modal={false}>
-            <DropdownMenuTrigger asChild>
-              <SidebarMenuButton
-                size="lg"
-                className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+    <>
+      <InviteModal
+        open={inviteOpen}
+        setOpen={setInviteOpen}
+        workspaceId={workspaceId}
+        name={activeWorkspace?.name ?? null}
+        joinCode={activeWorkspace?.joinCode ?? null}
+      />
+      <SidebarMenu>
+        <SidebarMenuItem>
+          {isPending || isPendingCurrentMember ? (
+            <div className="flex h-full w-full items-center justify-center">
+              <Loader2 className="h-5 w-5 animate-spin" />
+            </div>
+          ) : (
+            <DropdownMenu modal={false}>
+              <DropdownMenuTrigger asChild>
+                <SidebarMenuButton
+                  size="lg"
+                  className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                >
+                  <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+                    <Rocket className="size-4" />
+                  </div>
+                  <div className="grid flex-1 text-left text-sm leading-tight">
+                    <span className="truncate font-semibold">
+                      {activeWorkspace?.name}
+                    </span>
+                    <span className="truncate text-xs">
+                      {activeWorkspace?.joinCode}
+                    </span>
+                  </div>
+                  <ChevronsUpDown className="ml-auto" />
+                </SidebarMenuButton>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+                align="start"
+                side={isMobile ? "bottom" : "right"}
+                sideOffset={4}
               >
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                  <Rocket className="size-4" />
-                </div>
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">
-                    {activeWorkspace?.name}
-                  </span>
-                  <span className="truncate text-xs">
-                    {activeWorkspace?.joinCode}
-                  </span>
-                </div>
-                <ChevronsUpDown className="ml-auto" />
-              </SidebarMenuButton>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
-              align="start"
-              side={isMobile ? "bottom" : "right"}
-              sideOffset={4}
-            >
-              <DropdownMenuLabel className="text-xs text-muted-foreground">
-                Workspaces
-              </DropdownMenuLabel>
-              {filteredWorkspaces?.map((workspace, index) => (
-                <a href={`/workspace/${workspace.id}`} key={workspace.id}>
-                  <DropdownMenuItem className="gap-2 p-2 cursor-pointer">
-                    <div className="flex size-6 items-center justify-center rounded-sm border">
-                      <Rocket className="size-4 shrink-0" />
-                    </div>
-                    {workspace.name}
-                    <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
-                  </DropdownMenuItem>
-                </a>
-              ))}
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                className="gap-2 p-2 cursor-pointer"
-                onClick={() => setOpen(true)}
-              >
-                <div className="flex size-6 items-center justify-center rounded-md border bg-background">
-                  <Plus className="size-4" />
-                </div>
-                <div className="font-medium">Create new workspace</div>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
-      </SidebarMenuItem>
-    </SidebarMenu>
+                {currentMember?.role === "ADMIN" && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuLabel className="text-xs text-muted-foreground">
+                      ADMIN OPTIONS
+                    </DropdownMenuLabel>
+                    <DropdownMenuItem
+                      className="gap-2 p-2 cursor-pointer"
+                      onClick={() => setInviteOpen(true)}
+                    >
+                      <div className="flex size-6 items-center justify-center rounded-sm border">
+                        <Share className="size-4 shrink-0" />
+                      </div>
+                      <span className="truncate">
+                        Invite people to {activeWorkspace?.name}
+                      </span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="gap-2 p-2 cursor-pointer">
+                      <div className="flex size-6 items-center justify-center rounded-sm border">
+                        <Settings className="size-4 shrink-0" />
+                      </div>
+                      Preferences
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                  </>
+                )}
+                <DropdownMenuLabel className="text-xs text-muted-foreground">
+                  OTHER WORKSPACES
+                </DropdownMenuLabel>
+                {filteredWorkspaces?.map((workspace, index) => (
+                  <a href={`/workspace/${workspace.id}`} key={workspace.id}>
+                    <DropdownMenuItem className="gap-2 p-2 cursor-pointer">
+                      <div className="flex size-6 items-center justify-center rounded-sm border">
+                        <Rocket className="size-4 shrink-0" />
+                      </div>
+                      {workspace.name}
+                      <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
+                    </DropdownMenuItem>
+                  </a>
+                ))}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  className="gap-2 p-2 cursor-pointer"
+                  onClick={() => setOpen(true)}
+                >
+                  <div className="flex size-6 items-center justify-center rounded-md border bg-background">
+                    <Plus className="size-4" />
+                  </div>
+                  <div className="font-medium">Create new workspace</div>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+        </SidebarMenuItem>
+      </SidebarMenu>
+    </>
   );
 };
 

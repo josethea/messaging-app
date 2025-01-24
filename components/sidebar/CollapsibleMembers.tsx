@@ -11,17 +11,19 @@ import {
   SidebarMenuSubItem,
   SidebarMenuSubButton,
 } from "@/components/ui/sidebar";
-import { Plus, Users, User } from "lucide-react";
+import { Plus, Users, User, BadgeCheck } from "lucide-react";
 import { ChevronRight } from "lucide-react";
 
 const CollapsibleMembers = ({
   isPending,
   data,
   workspaceId,
+  currentMember,
 }: {
   isPending: boolean;
   data: MemberPopulate[] | undefined;
   workspaceId: string | null;
+  currentMember: Member | null | undefined;
 }) => {
   return (
     <Collapsible
@@ -54,6 +56,9 @@ const CollapsibleMembers = ({
                   <a href={`/workspace/${workspaceId}/member/${member.id}`}>
                     <User />
                     <span>{member.name}</span>
+                    {member.id === currentMember?.id && (
+                      <BadgeCheck className="ml-auto" />
+                    )}
                   </a>
                 </SidebarMenuSubButton>
               </SidebarMenuSubItem>

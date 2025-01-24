@@ -67,3 +67,29 @@ export const createWorkspace = async ({
 
   return workspace[0].id;
 };
+
+export const updateJoinCode = async (
+  workspaceId: string | null,
+): Promise<string | null> => {
+  const session = await auth();
+
+  if (!session) {
+    console.log("Unauthorized");
+    return null;
+  }
+
+  if (!workspaceId) {
+    console.log("Workspace not found");
+    return null;
+  }
+
+  const joinCode = generateCode();
+
+  await db
+    .update(workspaces)
+    .set({ joinCode })
+    .where(eq(workspaces.id, workspaceId))
+    .returning();
+
+  return joinCode;
+};

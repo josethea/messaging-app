@@ -55,3 +55,26 @@ export const createChannel = async ({
 
   return channel[0].id;
 };
+
+export const getChannel = async (
+  channelId: string | null,
+): Promise<Channel | null> => {
+  const session = await auth();
+
+  if (!session) {
+    console.log("Unauthorized");
+    return null;
+  }
+
+  if (!channelId) {
+    console.log("Channel not found");
+    return null;
+  }
+
+  const data = await db
+    .select()
+    .from(channels)
+    .where(eq(channels.id, channelId));
+
+  return data[0] as Channel;
+};

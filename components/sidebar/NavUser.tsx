@@ -112,7 +112,7 @@ const NavUser = ({ session }: { session: Session }) => {
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={logout}>
+            <DropdownMenuItem className="cursor-pointer" onClick={logout}>
               <LogOut />
               Log out
             </DropdownMenuItem>

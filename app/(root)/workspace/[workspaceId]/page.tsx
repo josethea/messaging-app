@@ -28,7 +28,7 @@ const Page = () => {
   }, [channelId, isPending, router, workspaceId]);
 
   return (
-    <div className="flex w-full h-full items-center justify-center">
+    <div className="flex h-screen w-screen items-center justify-center">
       <Loader2 className="h-10 w-10 animate-spin" />
     </div>
   );

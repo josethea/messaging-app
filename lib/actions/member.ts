@@ -3,7 +3,7 @@
 import { auth } from "@/auth";
 import { db } from "@/database/drizzle";
 import { members, users } from "@/database/schema";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 
 export const getMembers = async (
   workspaceId: string | null,
@@ -44,4 +44,33 @@ export const getMembers = async (
     }
   }
   return membersData;
+};
+
+export const getCurrentMember = async (
+  workspaceId: string | null,
+): Promise<Member | null> => {
+  const session = await auth();
+
+  if (!session) {
+    console.log("Unauthorized");
+    return null;
+  }
+
+  if (!workspaceId) {
+    console.log("Workspace not found");
+    return null;
+  }
+
+  const data = await db
+    .select()
+    .from(members)
+    .where(
+      and(
+        eq(members.workspaceId, workspaceId),
+        eq(members.userId, session.user.id!),
+      ),
+    )
+    .limit(1);
+
+  return data[0] as Member;
 };
