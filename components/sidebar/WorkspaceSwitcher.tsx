@@ -28,6 +28,10 @@ import { useCreateWorkspaceModal } from "@/lib/store/useCreateWorkspaceModal";
 import { useQuery } from "@tanstack/react-query";
 import { getWorkspaces } from "@/lib/actions/workspace";
 import InviteModal from "../modals/InviteModal";
+import {
+  useGetWorkspaces,
+  useGetWorkspacesStore,
+} from "@/lib/store/useGetWorkspaces";
 
 const WorkspaceSwitcher = ({
   workspaceId,
@@ -40,19 +44,16 @@ const WorkspaceSwitcher = ({
 }) => {
   const { isMobile } = useSidebar();
   const { setOpen } = useCreateWorkspaceModal();
-
   const [inviteOpen, setInviteOpen] = useState(false);
-
-  const { isPending, data: workspaces } = useQuery({
-    queryKey: ["workspaces"],
-    queryFn: () => getWorkspaces(),
-  });
-
-  const activeWorkspace = workspaces?.find(
+  const { isPending } = useGetWorkspaces();
+  const workspacesData = useGetWorkspacesStore((state) => state.workspaces);
+  const updateWorkspace = useGetWorkspacesStore(
+    (state) => state.updateWorkspace,
+  );
+  const activeWorkspace = workspacesData.find(
     (workspace) => workspace.id === workspaceId,
   );
-
-  const filteredWorkspaces = workspaces?.filter(
+  const filteredWorkspaces = workspacesData.filter(
     (workspace) => workspace.id !== workspaceId,
   );
 
@@ -64,6 +65,7 @@ const WorkspaceSwitcher = ({
         workspaceId={workspaceId}
         name={activeWorkspace?.name ?? null}
         joinCode={activeWorkspace?.joinCode ?? null}
+        updateWorkspace={updateWorkspace}
       />
       <SidebarMenu>
         <SidebarMenuItem>

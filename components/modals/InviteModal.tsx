@@ -23,12 +23,14 @@ const InviteModal = ({
   name,
   joinCode,
   workspaceId,
+  updateWorkspace,
 }: {
   open: boolean;
   setOpen: (open: boolean) => void;
   name: string | null;
   joinCode: string | null;
   workspaceId: string | null;
+  updateWorkspace: (workspace: Workspace) => void;
 }) => {
   const [ConfirmDialog, confirm] = useConfirm(
     "Are you sure?",
@@ -44,15 +46,14 @@ const InviteModal = ({
 
     if (!ok) return;
 
-    const newJoinCode = await mutateAsync();
+    const newWorkspace = await mutateAsync();
 
-    console.log(newJoinCode);
-
-    if (newJoinCode) {
+    if (newWorkspace) {
       toast({
         title: "Success",
         description: "New invite code generated",
       });
+      updateWorkspace(newWorkspace);
     } else {
       toast({
         title: "Error",

@@ -70,7 +70,7 @@ export const createWorkspace = async ({
 
 export const updateJoinCode = async (
   workspaceId: string | null,
-): Promise<string | null> => {
+): Promise<Workspace | null> => {
   const session = await auth();
 
   if (!session) {
@@ -85,11 +85,11 @@ export const updateJoinCode = async (
 
   const joinCode = generateCode();
 
-  await db
+  const workspace = await db
     .update(workspaces)
     .set({ joinCode })
     .where(eq(workspaces.id, workspaceId))
     .returning();
 
-  return joinCode;
+  return workspace[0] as Workspace;
 };
