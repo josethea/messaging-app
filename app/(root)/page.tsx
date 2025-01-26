@@ -1,6 +1,6 @@
 "use client";
 
-import { getWorkspaces } from "@/lib/actions/workspace";
+import { getLastWorkspace, getWorkspaces } from "@/lib/actions/workspace";
 import { useCreateWorkspaceModal } from "@/lib/store/useCreateWorkspaceModal";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
@@ -14,12 +14,12 @@ const Home = () => {
   const { open, setOpen } = useCreateWorkspaceModal();
   const { skip } = useSkipUseEffect();
 
-  const { isPending, data: workspaces } = useQuery({
-    queryKey: ["workspaces"],
-    queryFn: () => getWorkspaces(),
+  const { isPending, data: lastWorkspace } = useQuery({
+    queryKey: ["lastWorkspace"],
+    queryFn: () => getLastWorkspace(),
   });
 
-  const workspaceId = workspaces?.[0]?.id;
+  const workspaceId = lastWorkspace?.id;
 
   useEffect(() => {
     if (skip) {

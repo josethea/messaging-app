@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect } from "react";
-import { getChannels } from "@/lib/actions/channel";
+import { getLastChannel } from "@/lib/actions/channel";
 import { useQuery } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -11,12 +11,13 @@ const Page = () => {
   const workspaceId = useWorkspaceId();
   const router = useRouter();
 
-  const { isPending, data: channels } = useQuery({
-    queryKey: ["channels"],
-    queryFn: () => getChannels(workspaceId),
+  const { isPending, data: lastChannel } = useQuery({
+    queryKey: ["lastChannel", workspaceId],
+    queryFn: () => getLastChannel(workspaceId),
+    enabled: !!workspaceId,
   });
 
-  const channelId = channels?.[0]?.id;
+  const channelId = lastChannel?.id;
 
   useEffect(() => {
     if (isPending) {
@@ -28,7 +29,7 @@ const Page = () => {
   }, [channelId, isPending, router, workspaceId]);
 
   return (
-    <div className="flex h-screen w-screen items-center justify-center">
+    <div className="flex h-full w-full items-center justify-center">
       <Loader2 className="h-10 w-10 animate-spin" />
     </div>
   );

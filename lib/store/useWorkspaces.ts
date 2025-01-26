@@ -9,7 +9,7 @@ interface DataState {
   updateWorkspace: (workspace: Workspace) => void;
 }
 
-export const useGetWorkspacesStore = create<DataState>()((set) => ({
+export const useWorkspacesStore = create<DataState>()((set) => ({
   workspaces: [],
   setWorkspaces: (newWorkspaces) => set({ workspaces: newWorkspaces }),
   updateWorkspace: (updatedWorkspace) =>
@@ -20,13 +20,13 @@ export const useGetWorkspacesStore = create<DataState>()((set) => ({
     })),
 }));
 
-export const useGetWorkspaces = () => {
-  const setWorkspaces = useGetWorkspacesStore(
+export const useWorkspaces = () => {
+  const setWorkspaces = useWorkspacesStore(
     (state: DataState) => state.setWorkspaces,
   );
 
   const query = useQuery({
-    queryKey: ["data"],
+    queryKey: ["workspaces"],
     queryFn: () => getWorkspaces(),
   });
 

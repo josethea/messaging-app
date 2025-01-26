@@ -3,7 +3,7 @@
 import { auth } from "@/auth";
 import { db } from "@/database/drizzle";
 import { channels } from "@/database/schema";
-import { eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 
 export const getChannels = async (
   workspaceId: string | null,
@@ -23,9 +23,39 @@ export const getChannels = async (
   const data = await db
     .select()
     .from(channels)
-    .where(eq(channels.workspaceId, workspaceId));
+    .where(eq(channels.workspaceId, workspaceId))
+    .orderBy(desc(channels.createdAt));
 
   return data as Channel[];
+};
+
+export const getLastChannel = async (
+  workspaceId: string | null,
+): Promise<Channel | null> => {
+  const session = await auth();
+
+  if (!session) {
+    console.log("Unauthorized");
+    return null;
+  }
+
+  if (!workspaceId) {
+    console.log("Workspace not found");
+    return null;
+  }
+
+  const data = await db
+    .select()
+    .from(channels)
+    .where(eq(channels.workspaceId, workspaceId))
+    .orderBy(desc(channels.createdAt))
+    .limit(1);
+
+  if (data.length === 0) {
+    return null;
+  }
+
+  return data[0] as Channel;
 };
 
 export const createChannel = async ({
@@ -36,11 +66,16 @@ export const createChannel = async ({
   name: string;
   description: string;
   workspaceId: string;
-}): Promise<string | null> => {
+}): Promise<Channel | null> => {
   const session = await auth();
 
   if (!session) {
     console.log("Unauthorized");
+    return null;
+  }
+
+  if (!workspaceId) {
+    console.log("Workspace not found");
     return null;
   }
 
@@ -53,7 +88,7 @@ export const createChannel = async ({
     })
     .returning();
 
-  return channel[0].id;
+  return channel[0] as Channel;
 };
 
 export const getChannel = async (

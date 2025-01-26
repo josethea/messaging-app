@@ -44,14 +44,14 @@ const CreateWorkspaceModal = () => {
   });
 
   const handleSubmit = async (data: z.infer<typeof createWorkspaceSchema>) => {
-    const workspaceId = await mutateAsync(data);
+    const workspace = await mutateAsync(data);
 
-    if (workspaceId) {
+    if (workspace) {
       toast({
         title: "Success",
         description: "Workspace created successfully",
       });
-      router.replace(`/workspace/${workspaceId}`);
+      router.replace(`/workspace/${workspace.id}`);
       if (!skip) {
         setSkip(true);
       }

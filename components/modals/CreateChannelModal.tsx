@@ -11,7 +11,6 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createChannelSchema } from "@/lib/validations";
-import { createWorkspace } from "@/lib/actions/workspace";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -27,11 +26,14 @@ import { toast } from "@/hooks/use-toast";
 import { useCreateChannelModal } from "@/lib/store/useCreateChannelModal";
 import { useWorkspaceId } from "@/hooks/use-workspace-id";
 import { createChannel } from "@/lib/actions/channel";
+import { useChannelsStore } from "@/lib/store/useChannels";
 
 const CreateChannelModal = () => {
   const workspaceId = useWorkspaceId();
   const router = useRouter();
   const { open, setOpen } = useCreateChannelModal();
+  const channels = useChannelsStore((data) => data.channels);
+  const setChannels = useChannelsStore((data) => data.setChannels);
 
   const form = useForm({
     resolver: zodResolver(createChannelSchema),
@@ -48,17 +50,18 @@ const CreateChannelModal = () => {
   const handleSubmit = async (data: z.infer<typeof createChannelSchema>) => {
     if (!workspaceId) return;
 
-    const channelId = await mutateAsync({
+    const newChannel = await mutateAsync({
       ...data,
       workspaceId,
     });
 
-    if (channelId) {
+    if (newChannel) {
       toast({
         title: "Success",
         description: "Channel created successfully",
       });
-      router.replace(`/workspace/${workspaceId}/channel/${channelId}`);
+      router.replace(`/workspace/${workspaceId}/channel/${newChannel.id}`);
+      setChannels([newChannel, ...channels]);
       handleClose();
     } else {
       toast({

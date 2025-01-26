@@ -31,11 +31,33 @@ export const getWorkspaces = async (): Promise<Workspace[]> => {
   return data as Workspace[];
 };
 
+export const getLastWorkspace = async (): Promise<Workspace | null> => {
+  const session = await auth();
+
+  if (!session) {
+    console.log("Unauthorized");
+    return null;
+  }
+
+  const data = await db
+    .select()
+    .from(workspaces)
+    .where(eq(workspaces.userId, session.user.id!))
+    .orderBy(desc(workspaces.createdAt))
+    .limit(1);
+
+  if (data.length === 0) {
+    return null;
+  }
+
+  return data[0] as Workspace;
+};
+
 export const createWorkspace = async ({
   name,
 }: {
   name: string;
-}): Promise<string | null> => {
+}): Promise<Workspace | null> => {
   const session = await auth();
 
   if (!session) {
@@ -65,7 +87,7 @@ export const createWorkspace = async ({
     workspaceId: workspace[0].id,
   });
 
-  return workspace[0].id;
+  return workspace[0] as Workspace;
 };
 
 export const updateJoinCode = async (

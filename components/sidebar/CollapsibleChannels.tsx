@@ -17,6 +17,7 @@ import {
 import { Frame, Plus, Hash } from "lucide-react";
 import { useCreateChannelModal } from "@/lib/store/useCreateChannelModal";
 import { useChannelId } from "@/hooks/use-channel-id";
+import { useRouter } from "next/navigation";
 
 const CollapsibleChannels = ({
   isPending,
@@ -27,6 +28,7 @@ const CollapsibleChannels = ({
   data: Channel[] | undefined;
   workspaceId: string | null;
 }) => {
+  const router = useRouter();
   const { setOpen } = useCreateChannelModal();
   const channelId = useChannelId();
 
@@ -60,11 +62,17 @@ const CollapsibleChannels = ({
                 <SidebarMenuSubButton
                   asChild
                   isActive={channel.id === channelId}
+                  onClick={() =>
+                    router.push(
+                      `/workspace/${workspaceId}/channel/${channel.id}`,
+                    )
+                  }
+                  className="cursor-pointer"
                 >
-                  <a href={`/workspace/${workspaceId}/channel/${channel.id}`}>
+                  <p>
                     <Hash />
                     <span>{channel.name}</span>
-                  </a>
+                  </p>
                 </SidebarMenuSubButton>
               </SidebarMenuSubItem>
             ))}

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React from "react";
 import {
   Sidebar,
   SidebarContent,
@@ -16,27 +16,23 @@ import { Session } from "next-auth";
 import CollapsibleChannels from "@/components/sidebar/CollapsibleChannels";
 import CollapsibleMembers from "@/components/sidebar/CollapsibleMembers";
 import { useWorkspaceId } from "@/hooks/use-workspace-id";
-import { useQuery } from "@tanstack/react-query";
-import { getChannels } from "@/lib/actions/channel";
-import { getCurrentMember, getMembers } from "@/lib/actions/member";
+import { useChannels, useChannelsStore } from "@/lib/store/useChannels";
+import { useMembers, useMemberssStore } from "@/lib/store/useMembers";
+import {
+  useCurrentMember,
+  useCurrentMemberStore,
+} from "@/lib/store/useCurrentMember";
 
-const AppSidebar = ({ session }: { session: Session }) => {
+const AppSidebar = ({ session }: { session: Session | null }) => {
   const workspaceId = useWorkspaceId();
 
-  const { isPending: isPendingCurrentMember, data: currentMember } = useQuery({
-    queryKey: ["currentMember"],
-    queryFn: () => getCurrentMember(workspaceId),
-  });
+  const { isPending: isPendingChannels } = useChannels(workspaceId);
+  const { isPending: isPendingMembers } = useMembers(workspaceId);
+  const { isPending: isPendingCurrentMember } = useCurrentMember(workspaceId);
 
-  const { isPending: isPendingChannels, data: channels } = useQuery({
-    queryKey: ["channels"],
-    queryFn: () => getChannels(workspaceId),
-  });
-
-  const { isPending: isPendingMembers, data: members } = useQuery({
-    queryKey: ["members"],
-    queryFn: () => getMembers(workspaceId),
-  });
+  const channels = useChannelsStore((state) => state.channels);
+  const members = useMemberssStore((state) => state.members);
+  const currentMember = useCurrentMemberStore((state) => state.currentMember);
 
   return (
     <Sidebar collapsible="icon">

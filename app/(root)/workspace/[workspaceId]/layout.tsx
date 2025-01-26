@@ -1,16 +1,13 @@
+"use client";
+
 import React from "react";
-import { auth } from "@/auth";
-import { redirect } from "next/navigation";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import AppSidebar from "@/components/sidebar/AppSidebar";
 import Header from "@/components/sidebar/Header";
+import { useSession } from "next-auth/react";
 
-const Layout = async ({ children }: { children: React.ReactNode }) => {
-  const session = await auth();
-
-  if (!session) {
-    redirect("/sign-in");
-  }
+const Layout = ({ children }: { children: React.ReactNode }) => {
+  const { data: session } = useSession();
 
   return (
     <SidebarProvider>

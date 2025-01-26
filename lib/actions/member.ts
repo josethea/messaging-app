@@ -3,7 +3,7 @@
 import { auth } from "@/auth";
 import { db } from "@/database/drizzle";
 import { members, users } from "@/database/schema";
-import { and, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 
 export const getMembers = async (
   workspaceId: string | null,
@@ -23,7 +23,8 @@ export const getMembers = async (
   const data = await db
     .select()
     .from(members)
-    .where(eq(members.workspaceId, workspaceId));
+    .where(eq(members.workspaceId, workspaceId))
+    .orderBy(desc(members.createdAt));
 
   const membersData = [] as MemberPopulate[];
 

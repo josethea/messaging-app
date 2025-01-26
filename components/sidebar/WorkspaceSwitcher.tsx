@@ -28,10 +28,8 @@ import { useCreateWorkspaceModal } from "@/lib/store/useCreateWorkspaceModal";
 import { useQuery } from "@tanstack/react-query";
 import { getWorkspaces } from "@/lib/actions/workspace";
 import InviteModal from "../modals/InviteModal";
-import {
-  useGetWorkspaces,
-  useGetWorkspacesStore,
-} from "@/lib/store/useGetWorkspaces";
+import { useWorkspaces, useWorkspacesStore } from "@/lib/store/useWorkspaces";
+import { useRouter } from "next/navigation";
 
 const WorkspaceSwitcher = ({
   workspaceId,
@@ -42,19 +40,17 @@ const WorkspaceSwitcher = ({
   isPendingCurrentMember: boolean;
   currentMember: Member | null | undefined;
 }) => {
+  const router = useRouter();
   const { isMobile } = useSidebar();
   const { setOpen } = useCreateWorkspaceModal();
   const [inviteOpen, setInviteOpen] = useState(false);
-  const { isPending } = useGetWorkspaces();
-  const workspacesData = useGetWorkspacesStore((state) => state.workspaces);
-  const updateWorkspace = useGetWorkspacesStore(
-    (state) => state.updateWorkspace,
-  );
-  const activeWorkspace = workspacesData.find(
-    (workspace) => workspace.id === workspaceId,
-  );
-  const filteredWorkspaces = workspacesData.filter(
-    (workspace) => workspace.id !== workspaceId,
+  const { isPending } = useWorkspaces();
+
+  const workspaces = useWorkspacesStore((state) => state.workspaces);
+  const updateWorkspace = useWorkspacesStore((state) => state.updateWorkspace);
+  const activeWorkspace = workspaces.find((item) => item.id === workspaceId);
+  const filteredWorkspaces = workspaces.filter(
+    (item) => item.id !== workspaceId,
   );
 
   return (
@@ -130,15 +126,17 @@ const WorkspaceSwitcher = ({
                   OTHER WORKSPACES
                 </DropdownMenuLabel>
                 {filteredWorkspaces?.map((workspace, index) => (
-                  <a href={`/workspace/${workspace.id}`} key={workspace.id}>
-                    <DropdownMenuItem className="gap-2 p-2 cursor-pointer">
-                      <div className="flex size-6 items-center justify-center rounded-sm border">
-                        <Rocket className="size-4 shrink-0" />
-                      </div>
-                      {workspace.name}
-                      <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
-                    </DropdownMenuItem>
-                  </a>
+                  <DropdownMenuItem
+                    key={workspace.id}
+                    className="gap-2 p-2 cursor-pointer"
+                    onClick={() => router.push(`/workspace/${workspace.id}`)}
+                  >
+                    <div className="flex size-6 items-center justify-center rounded-sm border">
+                      <Rocket className="size-4 shrink-0" />
+                    </div>
+                    {workspace.name}
+                    <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
+                  </DropdownMenuItem>
                 ))}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
