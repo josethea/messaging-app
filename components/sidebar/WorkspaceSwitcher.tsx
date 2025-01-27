@@ -83,7 +83,7 @@ const WorkspaceSwitcher = ({
                     <span className="truncate font-semibold">
                       {activeWorkspace?.name}
                     </span>
-                    <span className="truncate text-xs">
+                    <span className="truncate text-xs uppercase">
                       {activeWorkspace?.joinCode}
                     </span>
                   </div>
