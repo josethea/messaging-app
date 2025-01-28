@@ -6,9 +6,8 @@ import MessageList from "@/components/chat/MessageList";
 import { useChannelId } from "@/hooks/use-channel-id";
 import { useWorkspaceId } from "@/hooks/use-workspace-id";
 import { getChannel } from "@/lib/actions/channel";
-import { getMessages } from "@/lib/actions/message";
 import { useMessages, useMessagesStore } from "@/lib/store/useMessages";
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 
 const Page = () => {

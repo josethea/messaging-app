@@ -3,7 +3,7 @@
 import { auth } from "@/auth";
 import { db } from "@/database/drizzle";
 import { members, messages, users } from "@/database/schema";
-import { and, desc, eq, lt } from "drizzle-orm";
+import { and, desc, eq, lt, sql } from "drizzle-orm";
 
 export const getMessages = async ({
   channelId,
@@ -17,13 +17,29 @@ export const getMessages = async ({
   parentMessageId?: string;
   cursor?: Date;
   limit?: number;
-}): Promise<Message[]> => {
+}): Promise<MessagePopulate[]> => {
   const session = await auth();
 
   if (!session) {
     console.log("Unauthorized");
-    return [] as Message[];
+    return [];
   }
+
+  const totalCount = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(messages)
+    .where(
+      and(
+        channelId ? eq(messages.channelId, channelId) : undefined,
+        conversationId
+          ? eq(messages.conversationId, conversationId)
+          : undefined,
+        parentMessageId
+          ? eq(messages.parentMessageId, parentMessageId)
+          : undefined,
+        cursor ? lt(messages.createdAt, cursor) : undefined,
+      ),
+    );
 
   const messagesData = await db
     .select()
@@ -66,6 +82,7 @@ export const getMessages = async ({
 
       return {
         ...item,
+        totalCount: Number(totalCount[0].count),
         member: {
           id: memberData[0].id,
           userId: memberData[0].userId,

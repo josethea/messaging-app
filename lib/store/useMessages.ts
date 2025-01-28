@@ -32,8 +32,15 @@ export const useMessages = (channelId: string | null) => {
         limit: 10,
       }),
     initialPageParam: undefined as Date | undefined,
-    getNextPageParam: (lastPage) => {
-      if (lastPage.length === 0 || lastPage.length < 10) return undefined;
+    getNextPageParam: (lastPage, allPages) => {
+      const totalFetched = allPages.reduce((sum, page) => sum + page.length, 0);
+
+      if (
+        lastPage.length === 0 ||
+        lastPage.length < 10 ||
+        totalFetched >= lastPage[0].totalCount
+      )
+        return undefined;
       return lastPage[lastPage.length - 1].createdAt;
     },
     enabled: !!channelId,

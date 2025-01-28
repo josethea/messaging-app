@@ -55,6 +55,7 @@ interface Message {
 }
 
 type MessagePopulate = Message & {
+  totalCount: number;
   member: Member;
   user: User;
 };
