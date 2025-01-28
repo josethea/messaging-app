@@ -23,10 +23,12 @@ const CollapsibleChannels = ({
   isPending,
   data,
   workspaceId,
+  currentMember,
 }: {
   isPending: boolean;
   data: Channel[] | undefined;
   workspaceId: string | null;
+  currentMember: Member | null;
 }) => {
   const router = useRouter();
   const { setOpen } = useCreateChannelModal();
@@ -52,9 +54,11 @@ const CollapsibleChannels = ({
             <ChevronRight />
           </SidebarMenuAction>
         </CollapsibleTrigger>
-        <SidebarMenuAction showOnHover onClick={() => setOpen(true)}>
-          <Plus />
-        </SidebarMenuAction>
+        {currentMember?.role === "ADMIN" && (
+          <SidebarMenuAction showOnHover onClick={() => setOpen(true)}>
+            <Plus />
+          </SidebarMenuAction>
+        )}
         <CollapsibleContent>
           <SidebarMenuSub>
             {data?.map((channel: Channel) => (

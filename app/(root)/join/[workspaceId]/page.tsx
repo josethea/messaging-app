@@ -13,7 +13,6 @@ import { getWorkspaceInfo, joinWorkspace } from "@/lib/actions/workspace";
 import { useWorkspacesStore } from "@/lib/store/useWorkspaces";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Loader2, MessageSquareCode } from "lucide-react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useCallback, useEffect, useState } from "react";
 

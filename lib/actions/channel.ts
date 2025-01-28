@@ -65,7 +65,7 @@ export const createChannel = async ({
 }: {
   name: string;
   description: string;
-  workspaceId: string;
+  workspaceId?: string;
 }): Promise<Channel | null> => {
   const session = await auth();
 

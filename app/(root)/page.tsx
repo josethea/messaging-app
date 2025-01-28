@@ -1,6 +1,6 @@
 "use client";
 
-import { getLastWorkspace, getWorkspaces } from "@/lib/actions/workspace";
+import { getLastWorkspace } from "@/lib/actions/workspace";
 import { useCreateWorkspaceModal } from "@/lib/store/useCreateWorkspaceModal";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";

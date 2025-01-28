@@ -27,13 +27,34 @@ interface Member {
 
 interface User {
   id: string;
-  name: string;
+  name?: string;
   email: string;
-  image: string | null;
+  image?: string;
 }
 
-type MemberPopulate = Member & {
-  name: string;
-  email: string;
-  image: string | null;
+type MemberPopulate = Member & Omit<User, "id">;
+
+interface Conversation {
+  id: string;
+  workspaceId: string;
+  memberOneId: string;
+  memberTwoId: string;
+}
+
+interface Message {
+  id: string;
+  content: string;
+  image?: string;
+  workspaceId: string;
+  memberId: string;
+  channelId?: string;
+  conversationId?: string;
+  parentMessageId?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+type MessagePopulate = Message & {
+  member: Member;
+  user: User;
 };

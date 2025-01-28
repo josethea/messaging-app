@@ -50,6 +50,7 @@ const AppSidebar = ({ session }: { session: Session | null }) => {
               workspaceId={workspaceId}
               isPending={isPendingChannels}
               data={channels}
+              currentMember={currentMember}
             />
             <CollapsibleMembers
               workspaceId={workspaceId}

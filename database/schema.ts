@@ -5,6 +5,7 @@ import {
   text,
   integer,
   primaryKey,
+  PgColumn,
 } from "drizzle-orm/pg-core";
 import { AdapterAccountType } from "next-auth/adapters";
 
@@ -76,7 +77,7 @@ export const members = pgTable("member", {
   userId: text("userId")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
-  role: MEMBER_ROLE("role").default("MEMBER"),
+  role: MEMBER_ROLE("role").notNull().default("MEMBER"),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
 });
@@ -90,6 +91,51 @@ export const channels = pgTable("channel", {
     .references(() => workspaces.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
   description: text("description"),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+});
+
+export const conversations = pgTable("conversation", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  workspaceId: text("workspaceId")
+    .notNull()
+    .references(() => workspaces.id, { onDelete: "cascade" }),
+  memberOneId: text("memberOneId")
+    .notNull()
+    .references(() => members.id, { onDelete: "cascade" }),
+  memberTwoId: text("memberTwoId")
+    .notNull()
+    .references(() => members.id, { onDelete: "cascade" }),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+});
+
+export const messages = pgTable("message", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  content: text("content").notNull(),
+  image: text("image"),
+  workspaceId: text("workspaceId")
+    .notNull()
+    .references(() => workspaces.id, { onDelete: "cascade" }),
+  memberId: text("memberId")
+    .notNull()
+    .references(() => members.id, { onDelete: "cascade" }),
+  channelId: text("channelId").references(() => channels.id, {
+    onDelete: "cascade",
+  }),
+  conversationId: text("conversationId").references(() => conversations.id, {
+    onDelete: "cascade",
+  }),
+  parentMessageId: text("parentMessageId").references(
+    (): PgColumn => messages.id,
+    {
+      onDelete: "cascade",
+    },
+  ),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
 });

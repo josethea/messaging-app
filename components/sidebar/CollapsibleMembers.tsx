@@ -23,7 +23,7 @@ const CollapsibleMembers = ({
   isPending: boolean;
   data: MemberPopulate[] | undefined;
   workspaceId: string | null;
-  currentMember: Member | null | undefined;
+  currentMember: Member | null;
 }) => {
   return (
     <Collapsible

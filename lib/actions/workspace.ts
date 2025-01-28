@@ -70,10 +70,11 @@ export const getLastWorkspace = async (): Promise<Workspace | null> => {
   const data = await db
     .select()
     .from(workspaces)
-    .where(eq(workspaces.userId, membersData[0].workspaceId))
+    .where(eq(workspaces.id, membersData[0].workspaceId))
     .limit(1);
 
   if (data.length === 0) {
+    console.log(`Workspace not found`);
     return null;
   }
 

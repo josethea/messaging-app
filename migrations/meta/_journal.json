@@ -15,6 +15,20 @@
       "when": 1737629679048,
       "tag": "0001_worthless_namorita",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1738014189174,
+      "tag": "0002_mighty_moira_mactaggert",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1738087090556,
+      "tag": "0003_opposite_masque",
+      "breakpoints": true
     }
   ]
 }
