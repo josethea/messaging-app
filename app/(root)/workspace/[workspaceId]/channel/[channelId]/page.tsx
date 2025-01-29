@@ -4,6 +4,7 @@ import Header from "@/components/chat/Header";
 import MessageInput from "@/components/chat/MessageInput";
 import MessageList from "@/components/chat/MessageList";
 import { useChannelId } from "@/hooks/use-channel-id";
+import { useSocket } from "@/hooks/use-socket";
 import { useWorkspaceId } from "@/hooks/use-workspace-id";
 import { getChannel } from "@/lib/actions/channel";
 import { useMessages, useMessagesStore } from "@/lib/store/useMessages";
@@ -13,6 +14,7 @@ import { Loader2 } from "lucide-react";
 const Page = () => {
   const workspaceId = useWorkspaceId();
   const channelId = useChannelId();
+  const socket = useSocket(channelId!);
 
   const { isPending, data: currentChannel } = useQuery({
     queryKey: ["currentChannel", channelId],
@@ -59,7 +61,11 @@ const Page = () => {
         )}
       </div>
       <div className="sticky bottom-0 inset-x-0 bg-background">
-        <MessageInput channel={currentChannel} workspaceId={workspaceId!} />
+        <MessageInput
+          channel={currentChannel}
+          workspaceId={workspaceId!}
+          socket={socket!}
+        />
       </div>
     </div>
   );

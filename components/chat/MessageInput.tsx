@@ -7,13 +7,16 @@ import { createMessage } from "@/lib/actions/message";
 import { toast } from "@/hooks/use-toast";
 import { useMessagesStore } from "@/lib/store/useMessages";
 import { useMoreData } from "@/lib/store/useMoreData";
+import { Socket } from "socket.io-client";
 
 const MessageInput = ({
   channel,
   workspaceId,
+  socket,
 }: {
   channel: Channel;
   workspaceId: string;
+  socket: Socket;
 }) => {
   const [message, setMessage] = useState("");
   const allMessages = useMessagesStore((state) => state.messages);
@@ -34,6 +37,7 @@ const MessageInput = ({
     if (messageData) {
       setMoreData(false);
       setMessages([messageData, ...allMessages]);
+      socket.emit("new-message", messageData);
     } else {
       toast({
         title: "Error",
@@ -51,6 +55,7 @@ const MessageInput = ({
         <Input
           placeholder={`Message #${channel?.name}`}
           value={message}
+          disabled={isPending}
           onChange={(e) => setMessage(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === "Enter" && !e.shiftKey) {
