@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "tsx server.ts",
-    "build": "next build && tsc --project tsconfig.server.json",
+    "build": "next build && tsx --project tsconfig.server.json",
     "start": "NODE_ENV=production node dist/server.js",
     "lint": "next lint",
     "db:generate": "npx drizzle-kit generate",
