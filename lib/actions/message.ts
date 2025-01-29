@@ -25,83 +25,63 @@ export const getMessages = async ({
     return [];
   }
 
-  const totalCount = await db
-    .select({ count: sql<number>`count(*)` })
-    .from(messages)
-    .where(
-      and(
-        channelId ? eq(messages.channelId, channelId) : undefined,
-        conversationId
-          ? eq(messages.conversationId, conversationId)
-          : undefined,
-        parentMessageId
-          ? eq(messages.parentMessageId, parentMessageId)
-          : undefined,
-        cursor ? lt(messages.createdAt, cursor) : undefined,
+  const [totalCount, messagesData] = await Promise.all([
+    db
+      .select({ count: sql<number>`count(*)` })
+      .from(messages)
+      .where(
+        and(
+          channelId ? eq(messages.channelId, channelId) : undefined,
+          conversationId
+            ? eq(messages.conversationId, conversationId)
+            : undefined,
+          parentMessageId
+            ? eq(messages.parentMessageId, parentMessageId)
+            : undefined,
+          cursor ? lt(messages.createdAt, cursor) : undefined,
+        ),
       ),
-    );
+    db
+      .select({
+        message: messages,
+        member: members,
+        user: users,
+      })
+      .from(messages)
+      .leftJoin(members, eq(messages.memberId, members.id))
+      .leftJoin(users, eq(members.userId, users.id))
+      .where(
+        and(
+          channelId ? eq(messages.channelId, channelId) : undefined,
+          conversationId
+            ? eq(messages.conversationId, conversationId)
+            : undefined,
+          parentMessageId
+            ? eq(messages.parentMessageId, parentMessageId)
+            : undefined,
+          cursor ? lt(messages.createdAt, cursor) : undefined,
+        ),
+      )
+      .orderBy(desc(messages.createdAt))
+      .limit(limit),
+  ]);
 
-  const messagesData = await db
-    .select()
-    .from(messages)
-    .where(
-      and(
-        channelId ? eq(messages.channelId, channelId) : undefined,
-        conversationId
-          ? eq(messages.conversationId, conversationId)
-          : undefined,
-        parentMessageId
-          ? eq(messages.parentMessageId, parentMessageId)
-          : undefined,
-        cursor ? lt(messages.createdAt, cursor) : undefined,
-      ),
-    )
-    .orderBy(desc(messages.createdAt))
-    .limit(limit);
-
-  const messagesWithUsers = await Promise.all(
-    messagesData.map(async (item) => {
-      const memberData = await db
-        .select()
-        .from(members)
-        .where(eq(members.id, item.memberId))
-        .limit(1);
-
-      const userData =
-        memberData.length > 0
-          ? await db
-              .select()
-              .from(users)
-              .where(eq(users.id, memberData[0]?.userId))
-              .limit(1)
-          : [];
-
-      if (memberData.length === 0 || userData.length === 0) {
-        return null;
-      }
-
-      return {
-        ...item,
-        totalCount: Number(totalCount[0].count),
-        member: {
-          id: memberData[0].id,
-          userId: memberData[0].userId,
-          workspaceId: memberData[0].workspaceId,
-          role: memberData[0].role,
-        },
-        user: {
-          id: userData[0].id,
-          name: userData[0].name,
-          email: userData[0].email,
-          image: userData[0].image,
-        },
-      };
-    }),
-  );
-
-  return messagesWithUsers.filter(
-    (message) => message !== null,
-  ) as MessagePopulate[];
+  return messagesData.map(({ message, member, user }) => ({
+    ...message,
+    totalCount: Number(totalCount[0].count),
+    member: {
+      id: member?.id,
+      userId: member?.userId,
+      workspaceId: member?.workspaceId,
+      role: member?.role,
+    },
+    user: {
+      id: user?.id,
+      name: user?.name,
+      email: user?.email,
+      image: user?.image,
+    },
+  })) as MessagePopulate[];
 };
 
 export const createMessage = async ({

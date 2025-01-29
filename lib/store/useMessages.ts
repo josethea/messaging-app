@@ -31,6 +31,7 @@ export const useMessages = (channelId: string | null) => {
         cursor: pageParam,
         limit: 10,
       }),
+    refetchOnWindowFocus: false,
     initialPageParam: undefined as Date | undefined,
     getNextPageParam: (lastPage, allPages) => {
       const totalFetched = allPages.reduce((sum, page) => sum + page.length, 0);
