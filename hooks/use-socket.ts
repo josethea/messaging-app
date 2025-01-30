@@ -18,7 +18,6 @@ export const useSocket = (channelId: string) => {
 
     return () => {
       socket.emit("leave-channel", channelId);
-      // socket.disconnect();
     };
   }, [channelId, messages, setMessages, setMoreData]);
 

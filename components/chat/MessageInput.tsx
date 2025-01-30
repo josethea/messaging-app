@@ -50,7 +50,7 @@ const MessageInput = ({
   };
 
   return (
-    <div className="border-t p-4">
+    <div className="border-t p-4 h-16">
       <div className="flex gap-x-2">
         <Input
           placeholder={`Message #${channel?.name}`}

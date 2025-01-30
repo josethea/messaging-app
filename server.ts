@@ -2,7 +2,6 @@ import { createServer } from "http";
 import { parse } from "url";
 import next from "next";
 import { Server } from "socket.io";
-// import socketHandler from './server/sockets';
 
 const port = parseInt(process.env.PORT || "3000", 10);
 const dev = process.env.NODE_ENV !== "production";
@@ -15,9 +14,6 @@ app.prepare().then(() => {
     handle(req, res, parsedUrl);
   });
 
-  /**
-   * Socket.io server
-   */
   const io = new Server(httpServer, {
     cors: {
       origin: "*",
@@ -25,11 +21,7 @@ app.prepare().then(() => {
     },
   });
   io.on("connection", (socket) => {
-    // socketHandler(socket, io);
-    console.log("connected", socket.id);
-
     socket.on("join-channel", (channelId: string) => {
-      console.log("joined channel", channelId);
       socket.join(channelId);
     });
 

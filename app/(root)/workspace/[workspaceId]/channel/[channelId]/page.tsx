@@ -46,7 +46,7 @@ const Page = () => {
   return (
     <div className="flex h-full flex-col">
       <Header channel={currentChannel} />
-      <div className="flex-1 h-[calc(100%-8rem)] relative">
+      <div className="h-[calc(100dvh-8rem)] relative group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-[calc(100dvh-7rem)]">
         {status === "pending" ? (
           <div className="flex h-full w-full items-center justify-center">
             <Loader2 className="h-10 w-10 animate-spin" />
