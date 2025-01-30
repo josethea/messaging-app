@@ -25,7 +25,6 @@ const MessageInput = ({
   conversationId: string | null;
 }) => {
   const [message, setMessage] = useState("");
-  const allMessages = useMessagesStore((state) => state.messages);
   const setMessages = useMessagesStore((state) => state.setMessages);
   const setMoreData = useMoreData((state) => state.setMoreData);
 
@@ -43,7 +42,7 @@ const MessageInput = ({
 
     if (messageData) {
       setMoreData(false);
-      setMessages([messageData, ...allMessages]);
+      setMessages((prev: MessagePopulate[]) => [messageData, ...prev]);
       socket.emit("new-message", messageData);
     } else {
       toast({

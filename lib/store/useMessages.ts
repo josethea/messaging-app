@@ -5,13 +5,23 @@ import { useEffect } from "react";
 
 interface DataState {
   messages: MessagePopulate[];
-  setMessages: (messages: MessagePopulate[]) => void;
+  setMessages: (
+    messages:
+      | MessagePopulate[]
+      | ((prev: MessagePopulate[]) => MessagePopulate[]),
+  ) => void;
   updateMessage: (message: MessagePopulate) => void;
 }
 
 export const useMessagesStore = create<DataState>()((set) => ({
   messages: [],
-  setMessages: (newMessages) => set({ messages: newMessages }),
+  setMessages: (newMessages) =>
+    set((state) => ({
+      messages:
+        typeof newMessages === "function"
+          ? newMessages(state.messages)
+          : newMessages,
+    })),
   updateMessage: (updatedMessage) =>
     set((state) => ({
       messages: state.messages.map((item) =>

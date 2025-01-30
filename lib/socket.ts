@@ -1,5 +1,16 @@
 "use client";
 
-import { io } from "socket.io-client";
+import { io, Socket } from "socket.io-client";
 
-export const socket = io();
+let socket: Socket;
+
+export const getSocket = () => {
+  if (!socket) {
+    socket = io({
+      reconnection: true,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1000,
+    });
+  }
+  return socket;
+};

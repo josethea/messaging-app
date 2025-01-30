@@ -30,17 +30,14 @@ app.prepare().then(() => {
     });
 
     socket.on("join-conversation", (conversationId: string) => {
-      console.log("joined conversation", conversationId);
       socket.join(conversationId);
     });
 
     socket.on("leave-conversation", (conversationId: string) => {
-      console.log("leave conversation", conversationId);
       socket.leave(conversationId);
     });
 
     socket.on("new-message", (message: MessagePopulate) => {
-      console.log("new message", message);
       if (message.channelId) {
         socket.to(message.channelId!).emit("message-received", message);
       } else if (message.conversationId) {
