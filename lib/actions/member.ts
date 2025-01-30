@@ -75,3 +75,41 @@ export const getCurrentMember = async (
 
   return data[0] as Member;
 };
+
+export const getMember = async (
+  memberId: string | null,
+): Promise<MemberPopulate | null> => {
+  const session = await auth();
+
+  if (!session) {
+    console.log("Unauthorized");
+    return null;
+  }
+
+  if (!memberId) {
+    console.log("MemberId was not provided");
+    return null;
+  }
+
+  const data = await db
+    .select({
+      member: members,
+      user: users,
+    })
+    .from(members)
+    .leftJoin(users, eq(users.id, members.userId))
+    .where(eq(members.id, memberId))
+    .limit(1);
+
+  if (data.length === 0 || !data[0].user) {
+    console.log("Member or user not found");
+    return null;
+  }
+
+  return {
+    ...data[0].member,
+    name: data[0].user.name as string,
+    email: data[0].user.email,
+    image: data[0].user.image as string,
+  } as MemberPopulate;
+};

@@ -11,8 +11,10 @@ import {
   SidebarMenuSubItem,
   SidebarMenuSubButton,
 } from "@/components/ui/sidebar";
+import { useMemberId } from "@/hooks/use-member-id";
 import { Plus, Users, User, BadgeCheck } from "lucide-react";
 import { ChevronRight } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const CollapsibleMembers = ({
   isPending,
@@ -25,6 +27,9 @@ const CollapsibleMembers = ({
   workspaceId: string | null;
   currentMember: Member | null;
 }) => {
+  const router = useRouter();
+  const memberId = useMemberId();
+
   return (
     <Collapsible
       key="members"
@@ -52,14 +57,21 @@ const CollapsibleMembers = ({
           <SidebarMenuSub>
             {data?.map((member: MemberPopulate) => (
               <SidebarMenuSubItem key={member.id}>
-                <SidebarMenuSubButton asChild>
-                  <a href={`/workspace/${workspaceId}/member/${member.id}`}>
+                <SidebarMenuSubButton
+                  asChild
+                  onClick={() =>
+                    router.push(`/workspace/${workspaceId}/member/${member.id}`)
+                  }
+                  isActive={member.id === memberId}
+                  className="cursor-pointer"
+                >
+                  <p>
                     <User />
                     <span>{member.name}</span>
                     {member.id === currentMember?.id && (
                       <BadgeCheck className="ml-auto" />
                     )}
-                  </a>
+                  </p>
                 </SidebarMenuSubButton>
               </SidebarMenuSubItem>
             ))}

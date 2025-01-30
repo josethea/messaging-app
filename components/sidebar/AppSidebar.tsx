@@ -22,6 +22,8 @@ import {
   useCurrentMember,
   useCurrentMemberStore,
 } from "@/lib/store/useCurrentMember";
+import { useChannelId } from "@/hooks/use-channel-id";
+import { useMemberId } from "@/hooks/use-member-id";
 
 const AppSidebar = ({ session }: { session: Session | null }) => {
   const workspaceId = useWorkspaceId();

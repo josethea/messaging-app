@@ -20,14 +20,21 @@ export const useMessagesStore = create<DataState>()((set) => ({
     })),
 }));
 
-export const useMessages = (channelId: string | null) => {
+export const useMessages = ({
+  channelId,
+  conversationId,
+}: {
+  channelId: string | null;
+  conversationId: string | null;
+}) => {
   const setMessages = useMessagesStore((state: DataState) => state.setMessages);
 
   const query = useInfiniteQuery({
-    queryKey: ["messages", channelId],
+    queryKey: ["messages", channelId ?? "", conversationId ?? ""],
     queryFn: ({ pageParam }: { pageParam: Date | undefined }) =>
       getMessages({
-        channelId: channelId!,
+        channelId: channelId ?? undefined,
+        conversationId: conversationId ?? undefined,
         cursor: pageParam,
         limit: 10,
       }),
@@ -40,11 +47,12 @@ export const useMessages = (channelId: string | null) => {
         lastPage.length === 0 ||
         lastPage.length < 10 ||
         totalFetched >= lastPage[0].totalCount
-      )
+      ) {
         return undefined;
+      }
       return lastPage[lastPage.length - 1].createdAt;
     },
-    enabled: !!channelId,
+    enabled: !!channelId || !!conversationId,
   });
 
   useEffect(() => {

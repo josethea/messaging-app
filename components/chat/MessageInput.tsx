@@ -11,12 +11,18 @@ import { Socket } from "socket.io-client";
 
 const MessageInput = ({
   channel,
+  member,
   workspaceId,
   socket,
+  type,
+  conversationId,
 }: {
-  channel: Channel;
+  channel: Channel | null;
+  member: MemberPopulate | null;
   workspaceId: string;
   socket: Socket;
+  type: "CHANNEL" | "MEMBER";
+  conversationId: string | null;
 }) => {
   const [message, setMessage] = useState("");
   const allMessages = useMessagesStore((state) => state.messages);
@@ -31,7 +37,8 @@ const MessageInput = ({
     const messageData = await mutateAsync({
       content: message,
       workspaceId: workspaceId!,
-      channelId: channel.id,
+      channelId: channel?.id,
+      conversationId: conversationId ?? undefined,
     });
 
     if (messageData) {
@@ -53,7 +60,7 @@ const MessageInput = ({
     <div className="border-t p-4 h-16">
       <div className="flex gap-x-2">
         <Input
-          placeholder={`Message #${channel?.name}`}
+          placeholder={`Message to #${type === "CHANNEL" ? channel?.name : member?.name}`}
           value={message}
           disabled={isPending}
           onChange={(e) => setMessage(e.target.value)}

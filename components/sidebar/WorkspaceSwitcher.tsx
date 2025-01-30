@@ -25,8 +25,6 @@ import {
   Settings,
 } from "lucide-react";
 import { useCreateWorkspaceModal } from "@/lib/store/useCreateWorkspaceModal";
-import { useQuery } from "@tanstack/react-query";
-import { getWorkspaces } from "@/lib/actions/workspace";
 import InviteModal from "../modals/InviteModal";
 import { useWorkspaces, useWorkspacesStore } from "@/lib/store/useWorkspaces";
 import { useRouter } from "next/navigation";

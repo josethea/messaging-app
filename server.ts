@@ -29,8 +29,23 @@ app.prepare().then(() => {
       socket.leave(channelId);
     });
 
+    socket.on("join-conversation", (conversationId: string) => {
+      console.log("joined conversation", conversationId);
+      socket.join(conversationId);
+    });
+
+    socket.on("leave-conversation", (conversationId: string) => {
+      console.log("leave conversation", conversationId);
+      socket.leave(conversationId);
+    });
+
     socket.on("new-message", (message: MessagePopulate) => {
-      socket.to(message.channelId!).emit("message-received", message);
+      console.log("new message", message);
+      if (message.channelId) {
+        socket.to(message.channelId!).emit("message-received", message);
+      } else if (message.conversationId) {
+        socket.to(message.conversationId!).emit("message-received", message);
+      }
     });
   });
 

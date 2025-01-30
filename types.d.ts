@@ -59,3 +59,10 @@ type MessagePopulate = Message & {
   member: Member;
   user: User;
 };
+
+type Conversation = {
+  id: string;
+  workspaceId: string;
+  memberOneId: string;
+  memberTwoId: string;
+};
