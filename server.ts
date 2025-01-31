@@ -8,6 +8,8 @@ const dev = process.env.NODE_ENV !== "production";
 const app = next({ dev });
 const handle = app.getRequestHandler();
 
+const activeChannelMembers: { [channelId: string]: Set<string> } = {};
+
 app.prepare().then(() => {
   const httpServer = createServer((req, res) => {
     const parsedUrl = parse(req.url!, true);
@@ -21,21 +23,54 @@ app.prepare().then(() => {
     },
   });
   io.on("connection", (socket) => {
-    socket.on("join-channel", (channelId: string) => {
-      socket.join(channelId);
-    });
+    socket.on(
+      "join-channel",
+      ({ memberId, channelId }: { memberId: string; channelId: string }) => {
+        if (!activeChannelMembers[channelId]) {
+          activeChannelMembers[channelId] = new Set();
+        }
+        activeChannelMembers[channelId].add(memberId);
+        console.log(activeChannelMembers);
+        socket.join(channelId);
+      },
+    );
 
-    socket.on("leave-channel", (channelId: string) => {
-      socket.leave(channelId);
-    });
+    socket.on(
+      "leave-channel",
+      ({ memberId, channelId }: { memberId: string; channelId: string }) => {
+        if (activeChannelMembers[channelId]) {
+          activeChannelMembers[channelId].delete(memberId);
+        }
+        console.log(activeChannelMembers);
+        socket.leave(channelId);
+      },
+    );
 
-    socket.on("join-conversation", (conversationId: string) => {
-      socket.join(conversationId);
-    });
+    socket.on(
+      "join-conversation",
+      ({
+        memberId,
+        conversationId,
+      }: {
+        memberId: string;
+        conversationId: string;
+      }) => {
+        socket.join(conversationId);
+      },
+    );
 
-    socket.on("leave-conversation", (conversationId: string) => {
-      socket.leave(conversationId);
-    });
+    socket.on(
+      "leave-conversation",
+      ({
+        memberId,
+        conversationId,
+      }: {
+        memberId: string;
+        conversationId: string;
+      }) => {
+        socket.leave(conversationId);
+      },
+    );
 
     socket.on("new-message", (message: MessagePopulate) => {
       if (message.channelId) {
@@ -45,6 +80,28 @@ app.prepare().then(() => {
       }
     });
   });
+
+  const shutdown = () => {
+    console.log("Closing all connections...");
+
+    // Remove process listeners before shutdown
+    process.removeListener("SIGINT", shutdown);
+    process.removeListener("SIGTERM", shutdown);
+
+    // Close all Socket.IO connections
+    io.close(() => {
+      console.log("All Socket.IO connections closed");
+
+      // Then close the HTTP server
+      httpServer.close(() => {
+        console.log("HTTP server closed");
+        process.exit(0);
+      });
+    });
+  };
+
+  process.on("SIGINT", shutdown);
+  process.on("SIGTERM", shutdown);
 
   httpServer.listen(port, () => {
     console.log(

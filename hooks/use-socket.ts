@@ -4,22 +4,30 @@ import { useMoreData } from "@/lib/store/useMoreData";
 import { useEffect, useRef } from "react";
 
 export const useSocket = ({
+  memberId,
   channelId,
   conversationId,
 }: {
+  memberId: string;
   channelId: string | null;
   conversationId: string | null;
 }) => {
   const socket = useRef(getSocket());
-  // const messages = useMessagesStore((state) => state.messages);
   const setMessages = useMessagesStore((state) => state.setMessages);
   const setMoreData = useMoreData((state) => state.setMoreData);
 
   useEffect(() => {
+    if (!memberId) {
+      return;
+    }
     if (channelId) {
-      socket.current.emit("join-channel", channelId);
+      console.log(`Member [${memberId}] joined to the channel [${channelId}]`);
+      socket.current.emit("join-channel", { memberId, channelId });
     } else if (conversationId) {
-      socket.current.emit("join-conversation", conversationId);
+      console.log(
+        `Member [${memberId}] joined to the conversation [${conversationId}]`,
+      );
+      socket.current.emit("join-conversation", { memberId, conversationId });
     }
 
     const handleMessage = (message: MessagePopulate) => {
@@ -33,12 +41,16 @@ export const useSocket = ({
       socket.current.off("message-received", handleMessage);
 
       if (channelId) {
-        socket.current.emit("leave-channel", channelId);
+        console.log(`Member [${memberId}] left the channel [${channelId}]`);
+        socket.current.emit("leave-channel", { memberId, channelId });
       } else if (conversationId) {
-        socket.current.emit("leave-conversation", conversationId);
+        console.log(
+          `Member [${memberId}] left the conversation [${channelId}]`,
+        );
+        socket.current.emit("leave-conversation", { memberId, conversationId });
       }
     };
-  }, [channelId, conversationId, setMessages, setMoreData]);
+  }, [memberId, channelId, conversationId, setMessages, setMoreData]);
 
   return socket.current;
 };

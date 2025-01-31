@@ -8,6 +8,7 @@ import { useSocket } from "@/hooks/use-socket";
 import { useWorkspaceId } from "@/hooks/use-workspace-id";
 import { getOrCreateConversation } from "@/lib/actions/conversation";
 import { getMember } from "@/lib/actions/member";
+import { useCurrentMemberStore } from "@/lib/store/useCurrentMember";
 import { useMessages, useMessagesStore } from "@/lib/store/useMessages";
 import { useQuery } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
@@ -16,6 +17,7 @@ import React from "react";
 const Page = () => {
   const workspaceId = useWorkspaceId();
   const memberId = useMemberId();
+  const currentMember = useCurrentMemberStore((state) => state.currentMember);
 
   const { isPending: isPendingCurrentChatMember, data: currentChatMember } =
     useQuery({
@@ -35,6 +37,7 @@ const Page = () => {
   });
 
   const socket = useSocket({
+    memberId: currentMember?.id as string,
     channelId: null,
     conversationId: conversation?.id!,
   });
