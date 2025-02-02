@@ -18,6 +18,11 @@ interface Channel {
   workspaceId: string;
 }
 
+interface ChannelsData {
+  unreadCount: number;
+  channel: Channel;
+}
+
 interface Member {
   id: string;
   userId: string;
@@ -60,9 +65,12 @@ type MessagePopulate = Message & {
   user: User;
 };
 
-type Conversation = {
+interface NotificationMessage {
   id: string;
   workspaceId: string;
-  memberOneId: string;
-  memberTwoId: string;
-};
+  memberId: string;
+  channelId?: string;
+  conversationId?: string;
+  messageId: string;
+  read: boolean;
+}

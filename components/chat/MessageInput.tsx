@@ -8,6 +8,7 @@ import { toast } from "@/hooks/use-toast";
 import { useMessagesStore } from "@/lib/store/useMessages";
 import { useMoreData } from "@/lib/store/useMoreData";
 import { Socket } from "socket.io-client";
+import { useMemberssStore } from "@/lib/store/useMembers";
 
 const MessageInput = ({
   channel,
@@ -27,6 +28,7 @@ const MessageInput = ({
   const [message, setMessage] = useState("");
   const setMessages = useMessagesStore((state) => state.setMessages);
   const setMoreData = useMoreData((state) => state.setMoreData);
+  const members = useMemberssStore((state) => state.members);
 
   const { mutateAsync, isPending } = useMutation({
     mutationFn: createMessage,
@@ -43,7 +45,10 @@ const MessageInput = ({
     if (messageData) {
       setMoreData(false);
       setMessages((prev: MessagePopulate[]) => [messageData, ...prev]);
-      socket.emit("new-message", messageData);
+      socket.emit("new-message", {
+        message: messageData,
+        memberIds: members.map((member) => member.id) as string[],
+      });
     } else {
       toast({
         title: "Error",
@@ -59,7 +64,7 @@ const MessageInput = ({
     <div className="border-t p-4 h-16">
       <div className="flex gap-x-2">
         <Input
-          placeholder={`Message to #${type === "CHANNEL" ? channel?.name : member?.name}`}
+          placeholder={`Message to #${channel || member ? (type === "CHANNEL" ? channel?.name : member?.name) : ""}`}
           value={message}
           disabled={isPending}
           onChange={(e) => setMessage(e.target.value)}

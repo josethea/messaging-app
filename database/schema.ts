@@ -6,6 +6,7 @@ import {
   integer,
   primaryKey,
   PgColumn,
+  boolean,
 } from "drizzle-orm/pg-core";
 import { AdapterAccountType } from "next-auth/adapters";
 
@@ -136,6 +137,30 @@ export const messages = pgTable("message", {
       onDelete: "cascade",
     },
   ),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+});
+
+export const notifications = pgTable("notification", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  workspaceId: text("workspaceId")
+    .notNull()
+    .references(() => workspaces.id, { onDelete: "cascade" }),
+  memberId: text("memberId")
+    .notNull()
+    .references(() => members.id, { onDelete: "cascade" }),
+  channelId: text("channelId").references(() => channels.id, {
+    onDelete: "cascade",
+  }),
+  conversationId: text("conversationId").references(() => conversations.id, {
+    onDelete: "cascade",
+  }),
+  messageId: text("messageId").references(() => messages.id, {
+    onDelete: "cascade",
+  }),
+  read: boolean("read").notNull().default(false),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
 });

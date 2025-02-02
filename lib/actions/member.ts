@@ -3,7 +3,7 @@
 import { auth } from "@/auth";
 import { db } from "@/database/drizzle";
 import { members, users } from "@/database/schema";
-import { and, asc, desc, eq } from "drizzle-orm";
+import { and, asc, eq } from "drizzle-orm";
 
 export const getMembers = async (
   workspaceId: string | null,

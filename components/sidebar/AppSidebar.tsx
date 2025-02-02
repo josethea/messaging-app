@@ -22,12 +22,16 @@ import {
   useCurrentMember,
   useCurrentMemberStore,
 } from "@/lib/store/useCurrentMember";
+import { useChannelId } from "@/hooks/use-channel-id";
+import { useMemberId } from "@/hooks/use-member-id";
 
 const AppSidebar = ({ session }: { session: Session | null }) => {
   const workspaceId = useWorkspaceId();
+  const channelId = useChannelId();
+  const memberId = useMemberId();
 
-  const { isPending: isPendingChannels } = useChannels(workspaceId);
-  const { isPending: isPendingMembers } = useMembers(workspaceId);
+  const { isPending: isPendingChannels } = useChannels(workspaceId, channelId);
+  const { isPending: isPendingMembers } = useMembers(workspaceId, memberId);
   const { isPending: isPendingCurrentMember } = useCurrentMember(workspaceId);
 
   const channels = useChannelsStore((state) => state.channels);

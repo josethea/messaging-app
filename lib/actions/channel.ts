@@ -2,22 +2,39 @@
 
 import { auth } from "@/auth";
 import { db } from "@/database/drizzle";
-import { channels } from "@/database/schema";
-import { desc, eq } from "drizzle-orm";
+import { channels, members } from "@/database/schema";
+import { and, desc, eq } from "drizzle-orm";
+import { getUnreadNotificationsNumber } from "./notification";
 
 export const getChannels = async (
   workspaceId: string | null,
-): Promise<Channel[]> => {
+): Promise<ChannelsData[]> => {
   const session = await auth();
 
   if (!session) {
     console.log("Unauthorized");
-    return [] as Channel[];
+    return [] as ChannelsData[];
   }
 
   if (!workspaceId) {
     console.log("Workspace not found");
-    return [] as Channel[];
+    return [] as ChannelsData[];
+  }
+
+  const member = await db
+    .select()
+    .from(members)
+    .where(
+      and(
+        eq(members.userId, session.user.id!),
+        eq(members.workspaceId, workspaceId),
+      ),
+    )
+    .limit(1);
+
+  if (member.length === 0) {
+    console.log("Member not found");
+    return [] as ChannelsData[];
   }
 
   const data = await db
@@ -26,7 +43,23 @@ export const getChannels = async (
     .where(eq(channels.workspaceId, workspaceId))
     .orderBy(desc(channels.createdAt));
 
-  return data as Channel[];
+  const channelsData = [] as ChannelsData[];
+
+  for (const item of data) {
+    const unreadMessages = await getUnreadNotificationsNumber({
+      workspaceId,
+      memberId: member[0].id,
+      channelId: item.id,
+      conversationId: undefined,
+    });
+
+    channelsData.push({
+      unreadCount: unreadMessages ?? 0,
+      channel: item as Channel,
+    });
+  }
+
+  return channelsData;
 };
 
 export const getLastChannel = async (

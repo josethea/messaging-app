@@ -18,6 +18,7 @@ import { Frame, Plus, Hash } from "lucide-react";
 import { useCreateChannelModal } from "@/lib/store/useCreateChannelModal";
 import { useChannelId } from "@/hooks/use-channel-id";
 import { useRouter } from "next/navigation";
+import useUnreadMessagesStore from "@/lib/store/useUnreadMessages";
 
 const CollapsibleChannels = ({
   isPending,
@@ -33,6 +34,7 @@ const CollapsibleChannels = ({
   const router = useRouter();
   const { setOpen } = useCreateChannelModal();
   const channelId = useChannelId();
+  const unreadCounts = useUnreadMessagesStore((state) => state.unreadCounts);
 
   return (
     <Collapsible
@@ -76,6 +78,11 @@ const CollapsibleChannels = ({
                   <p>
                     <Hash />
                     <span>{channel.name}</span>
+                    {unreadCounts[channel.id] > 0 && (
+                      <span className="ml-1 text-xs font-semibold rounded-full bg-red-500 text-white px-2 py-0.5">
+                        {unreadCounts[channel.id]}
+                      </span>
+                    )}
                   </p>
                 </SidebarMenuSubButton>
               </SidebarMenuSubItem>
