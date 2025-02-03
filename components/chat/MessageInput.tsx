@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Send } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -26,6 +26,7 @@ const MessageInput = ({
   conversationId: string | null;
 }) => {
   const [message, setMessage] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
   const setMessages = useMessagesStore((state) => state.setMessages);
   const setMoreData = useMoreData((state) => state.setMoreData);
   const members = useMemberssStore((state) => state.members);
@@ -58,15 +59,20 @@ const MessageInput = ({
     }
 
     setMessage("");
+    setTimeout(() => {
+      inputRef.current?.focus();
+    });
   };
 
   return (
     <div className="border-t p-4 h-16">
       <div className="flex gap-x-2">
         <Input
+          ref={inputRef}
           placeholder={`Message to #${channel || member ? (type === "CHANNEL" ? channel?.name : member?.name) : ""}`}
           value={message}
           disabled={isPending}
+          autoFocus
           onChange={(e) => setMessage(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === "Enter" && !e.shiftKey) {

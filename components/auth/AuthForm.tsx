@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   DefaultValues,
@@ -42,6 +42,7 @@ const AuthForm = <T extends FieldValues>({
 }: AuthFormProps<T>) => {
   const router = useRouter();
   const isSignIn = type === "SIGN_IN";
+  const [isPending, setIsPending] = useState(false);
 
   const form: UseFormReturn<T> = useForm({
     resolver: zodResolver(schema),
@@ -49,6 +50,7 @@ const AuthForm = <T extends FieldValues>({
   });
 
   const handleSubmit: SubmitHandler<T> = async (data: T) => {
+    setIsPending(true);
     const result = await onSubmit(data);
 
     if (result.success) {
@@ -66,6 +68,7 @@ const AuthForm = <T extends FieldValues>({
         description: result.error ?? "An error ocurred",
         variant: "destructive",
       });
+      setIsPending(false);
     }
   };
 
@@ -107,6 +110,7 @@ const AuthForm = <T extends FieldValues>({
                           <FormControl>
                             <Input
                               required
+                              disabled={isPending}
                               type={
                                 FIELD_TYPES[
                                   field.name as keyof typeof FIELD_NAMES
@@ -120,7 +124,7 @@ const AuthForm = <T extends FieldValues>({
                       )}
                     />
                   ))}
-                  <Button type="submit" className="w-full">
+                  <Button disabled={isPending} type="submit" className="w-full">
                     {isSignIn ? "Login" : "Sign Up"}
                   </Button>
                 </form>
@@ -131,7 +135,11 @@ const AuthForm = <T extends FieldValues>({
                 </span>
               </div>
               <div className="grid grid-cols-3 gap-4">
-                <Button variant="outline" className="w-full">
+                <Button
+                  disabled={isPending}
+                  variant="outline"
+                  className="w-full"
+                >
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                     <path
                       d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701"
@@ -141,6 +149,7 @@ const AuthForm = <T extends FieldValues>({
                   <span className="sr-only">Login with Apple</span>
                 </Button>
                 <Button
+                  disabled={isPending}
                   onClick={() => signIn("google")}
                   variant="outline"
                   className="w-full"
@@ -154,6 +163,7 @@ const AuthForm = <T extends FieldValues>({
                   <span className="sr-only">Login with Google</span>
                 </Button>
                 <Button
+                  disabled={isPending}
                   onClick={() => signIn("facebook")}
                   variant="outline"
                   className="w-full"
@@ -167,6 +177,7 @@ const AuthForm = <T extends FieldValues>({
                   <span className="sr-only">Login with Meta</span>
                 </Button>
                 <Button
+                  disabled={isPending}
                   onClick={() => signIn("github")}
                   variant="outline"
                   className="w-full"
@@ -179,7 +190,11 @@ const AuthForm = <T extends FieldValues>({
                   </svg>
                   <span className="sr-only">Login with Github</span>
                 </Button>
-                <Button variant="outline" className="w-full">
+                <Button
+                  disabled={isPending}
+                  variant="outline"
+                  className="w-full"
+                >
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
                     <path
                       d="M391.2 103.5H352.5v109.7h38.6zM285 103H246.4V212.8H285zM120.8 0 24.3 91.4V420.6H140.1V512l96.5-91.4h77.3L487.7 256V0zM449.1 237.8l-77.2 73.1H294.6l-67.6 64v-64H140.1V36.6H449.1z"
@@ -188,7 +203,11 @@ const AuthForm = <T extends FieldValues>({
                   </svg>
                   <span className="sr-only">Login with Twitch</span>
                 </Button>
-                <Button variant="outline" className="w-full">
+                <Button
+                  disabled={isPending}
+                  variant="outline"
+                  className="w-full"
+                >
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512">
                     <path
                       d="M524.5 69.8a1.5 1.5 0 0 0 -.8-.7A485.1 485.1 0 0 0 404.1 32a1.8 1.8 0 0 0 -1.9 .9 337.5 337.5 0 0 0 -14.9 30.6 447.8 447.8 0 0 0 -134.4 0 309.5 309.5 0 0 0 -15.1-30.6 1.9 1.9 0 0 0 -1.9-.9A483.7 483.7 0 0 0 116.1 69.1a1.7 1.7 0 0 0 -.8 .7C39.1 183.7 18.2 294.7 28.4 404.4a2 2 0 0 0 .8 1.4A487.7 487.7 0 0 0 176 479.9a1.9 1.9 0 0 0 2.1-.7A348.2 348.2 0 0 0 208.1 430.4a1.9 1.9 0 0 0 -1-2.6 321.2 321.2 0 0 1 -45.9-21.9 1.9 1.9 0 0 1 -.2-3.1c3.1-2.3 6.2-4.7 9.1-7.1a1.8 1.8 0 0 1 1.9-.3c96.2 43.9 200.4 43.9 295.5 0a1.8 1.8 0 0 1 1.9 .2c2.9 2.4 6 4.9 9.1 7.2a1.9 1.9 0 0 1 -.2 3.1 301.4 301.4 0 0 1 -45.9 21.8 1.9 1.9 0 0 0 -1 2.6 391.1 391.1 0 0 0 30 48.8 1.9 1.9 0 0 0 2.1 .7A486 486 0 0 0 610.7 405.7a1.9 1.9 0 0 0 .8-1.4C623.7 277.6 590.9 167.5 524.5 69.8zM222.5 337.6c-29 0-52.8-26.6-52.8-59.2S193.1 219.1 222.5 219.1c29.7 0 53.3 26.8 52.8 59.2C275.3 311 251.9 337.6 222.5 337.6zm195.4 0c-29 0-52.8-26.6-52.8-59.2S388.4 219.1 417.9 219.1c29.7 0 53.3 26.8 52.8 59.2C470.7 311 447.5 337.6 417.9 337.6z"

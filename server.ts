@@ -23,23 +23,54 @@ app.prepare().then(() => {
 
   initializeSocket(io);
 
-  const shutdown = () => {
+  const shutdown = async () => {
     console.log("Closing all connections...");
+    console.log(`Active Socket.IO connections: ${io.sockets.sockets.size}`);
 
     // Remove process listeners before shutdown
     process.removeListener("SIGINT", shutdown);
     process.removeListener("SIGTERM", shutdown);
 
-    // Close all Socket.IO connections
-    io.close(() => {
-      console.log("All Socket.IO connections closed");
-
-      // Then close the HTTP server
-      httpServer.close(() => {
-        console.log("HTTP server closed");
-        process.exit(0);
+    try {
+      // Force close all Socket.IO connections first
+      io.sockets.sockets.forEach((socket) => {
+        socket.disconnect(true);
       });
-    });
+
+      // Set a timeout for the entire shutdown process
+      const shutdownTimeout = setTimeout(() => {
+        console.log("Shutdown taking too long, forcing exit...");
+        process.exit(1);
+      }, 10000); // 10 seconds timeout
+
+      // First, stop accepting new connections
+      await new Promise<void>((resolve) => {
+        httpServer.close(() => {
+          console.log("HTTP server closed");
+          resolve();
+        });
+      });
+
+      // Then close all Socket.IO connections
+      await new Promise<void>((resolve, reject) => {
+        io.close((err) => {
+          if (err) {
+            console.error("Error closing Socket.IO:", err);
+            reject(err);
+            return;
+          }
+          console.log("All Socket.IO connections closed");
+          resolve();
+        });
+      });
+
+      clearTimeout(shutdownTimeout);
+      console.log("Shutdown completed successfully");
+      process.exit(0);
+    } catch (error) {
+      console.error("Error during shutdown:", error);
+      process.exit(1);
+    }
   };
 
   process.on("SIGINT", shutdown);
